@@ -77,6 +77,16 @@ def replace_min_space(value):
         value = re.sub(r'(\d+)\s+Minuten', r'\1~Minuten', value)
     return value
 
+def replace_percent(value):
+    return re.sub(r'(\d)%', r'\1\\%', value)
+
+def replace_numbers_with_step(text):
+    text = re.sub(r'\b\d+\.\s', r'\\step ', text)
+    return text
+
+def escape_ampersand(value):
+    return value.replace(r"&", r"\&")
+
 env = Environment(
     loader=FileSystemLoader("templates"),
     block_start_string="<<%",
@@ -90,6 +100,9 @@ env = Environment(
 env.filters['replace_celsius'] = replace_celsius
 env.filters['replace_min_space'] = replace_min_space
 env.filters['decimal_to_nicefrac'] = decimal_to_nicefrac
+env.filters['replace_percent'] = replace_percent
+env.filters['replace_numbers_with_step'] = replace_numbers_with_step
+env.filters['escape_ampersand'] = escape_ampersand
 
 response = requests.get(recipe_url, headers=headers)
 if response.status_code == 200:
@@ -102,7 +115,7 @@ else:
 
 choice = input("Would you like to export a certain recipe (enter ID) or all (a)? ")
 
-template = env.get_template('xcookybooky-nswissgerman-11pt.txt')
+template = env.get_template('xcookybooky-josh.txt')
 
 output_dir = "exported_recipes"
 os.makedirs(output_dir, exist_ok=True)

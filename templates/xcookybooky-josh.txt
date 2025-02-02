@@ -1,0 +1,59 @@
+\documentclass[letterpaper, 11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[english]{babel}
+\usepackage{nicefrac}
+\usepackage[nowarnings,myconfig]{xcookybooky}
+\DeclareRobustCommand{\textcelcius}{\ensuremath{^{\circ}\mathrm{C}}\hspace{0.3em}}
+\DeclareRobustCommand{\textfahrenheit}{\ensuremath{^{\circ}\mathrm{F}}\hspace{0.3em}}
+\setcounter{secnumdepth}{1}
+\renewcommand*{\recipesection}[2][]{\subsection[#1]{#2}}
+\renewcommand{\subsectionmark}[1]{}
+\usepackage{hyperref}
+\hypersetup{%
+ pdfauthor={Lia and Joshua},
+ pdftitle={<< recipe.name >>},
+ pdfsubject={Recipe},
+ pdfkeywords={Recipe, Cookbook, xcookybooky, LaTeX},
+ pdfstartview={FitV},
+ pdfview={FitH},
+ pdfpagemode={UseNone},
+ bookmarksopen={true},
+ colorlinks={true},
+ linkcolor={black},
+ urlcolor={blue},
+ citecolor={black},
+ filecolor={black}
+}
+\hbadness=10000
+\setlength{\headsep}{0.5cm}
+\setlength{\footskip}{14pt}
+\setlength{\topmargin}{-1cm} \setlength{\textheight}{24.5cm} % Adjust for letter size
+
+\begin{document}
+\thispagestyle{empty}
+
+\begin{recipe}[preparationtime = {\unit[<< recipe.working_time >>]{min}}, bakingtime={\unit[<< recipe.waiting_time >>]{min}}, portion = \portion{<< recipe.servings | decimal_to_nicefrac >>\hspace{0.2em}}, source = \href{<< recipe.source_url >>}{<< recipe.source_domain >>}]{<< recipe.name >>}
+\graph{big=Pictures/<< recipe.name >>.jpg}
+
+\ingredients{%
+<<% for step in recipe.steps %>><<% for ingredient in step.ingredients %>>\unit[<< ingredient.amount| decimal_to_nicefrac >>]<<% if ingredient.unit and ingredient.unit.name != "-" %>>{<<% if ingredient.amount > 1 and ingredient.unit.plural_name %>><< ingredient.unit.plural_name >><<% else %>><< ingredient.unit.name >><<% endif %>>}<<% endif %>> & <<% if ingredient.amount > 1 and ingredient.food.plural_name %>><< ingredient.food.plural_name | replace_percent >><<% else %>><< ingredient.food.name | replace_percent >><<% endif %>><<% if ingredient.note %>> {\textit{\footnotesize << ingredient.note >>}} <<% endif %>>\\
+<<% endfor %>><<% endfor %>>}
+
+<<# If there is more than one step do not format numbers (e.g. 1., 2.) #>>
+<<% if recipe.description %>>\introduction{<< recipe.description | replace_celsius | escape_ampersand >>} <<% endif %>>
+\preparation{%
+<<% if recipe.steps | length > 1 %>>
+<<% for step in recipe.steps %>>\step{<< step.instruction | replace_celsius | replace_min_space | replace_percent | escape_ampersand >>}
+<<% endfor %>>
+<<% else %>>
+<<# If there is only one step do format numbers (e.g. 1., 2.) #>>
+<<% for step in recipe.steps %>> << step.instruction | replace_celsius | replace_min_space | replace_numbers_with_step | replace_percent | escape_ampersand >>}
+<<% endfor %>>
+<<% endif %>>
+
+
+\end{recipe}
+\end{document}
